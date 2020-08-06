@@ -1,0 +1,39 @@
+version: 2.0
+
+jobs:
+  test:
+    docker:
+      - image: circleci/ruby:2.6-stretch
+      - image: hindsightsoftware/hotel-booking:latest
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: hotel-booking-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: Install Dependencies
+          command: bundle install --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - vendor/bundle
+          key: hotel-booking-{{ checksum "Gemfile.lock" }}
+
+      - run:
+          name: Wait for Backend connection
+          command: |
+            TIMEOUT=6
+            until [ "$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080/)" -eq 200 ] || [ $TIMEOUT -eq 0 ]; do echo "Waiting for port 8080, timeout: $((TIMEOUT--))"; sleep 10; done
+            if [[ "$TIMEOUT" -eq 0 ]]; then exit 1; fi
+
+      - run:
+          name: Unit Tests
+          command: cucumber -f json -o reports/cucumber.json
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
