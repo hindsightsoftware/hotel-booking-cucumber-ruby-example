@@ -9,19 +9,11 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          key: hotel-booking-{{ checksum "Gemfile.lock" }}
-
       - run:
           name: Install Dependencies
           command: |
             gem install bundler
-            bundle install --path vendor/bundle
-
-      - save_cache:
-          paths:
-            - vendor/bundle
-          key: hotel-booking-{{ checksum "Gemfile.lock" }}
+            bundle install
 
       - run:
           name: Wait for Backend connection
@@ -32,7 +24,8 @@ jobs:
 
       - run:
           name: Unit Tests
-          command: cucumber -f json -o reports/cucumber.json
+          command: |
+            rake features
 
 workflows:
   version: 2

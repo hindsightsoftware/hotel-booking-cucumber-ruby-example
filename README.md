@@ -10,7 +10,7 @@ First, run the [Hotel Booking app](https://github.com/hindsightsoftware/hotel-bo
 docker run --rm -p 8080:8080 --name=hotel-booking -itd hindsightsoftware/hotel-booking:latest
 ```
 
-Next, run the Cucumber Ruby tests. To generate Cucumber reports in the JSON format, use `cucumber -f json -o reports/cucumber.json`.
+Next, run the Cucumber Ruby tests. The report will be generated as a JSON file in `reports/cucumber.json`.
 
 ```bash
 gem install bundler
